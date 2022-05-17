@@ -1,0 +1,38 @@
+version: "3"
+services:
+  app:
+    build: ./flask_app
+    container_name: flask_app
+    depends_on:
+      - postgres
+    ports:
+      - 8080:5000
+    restart: always
+    environment:
+      NODE_ENV: test
+      DB_HOST: postgres
+      DB_USER: postgres
+      DB_PASSWORD: password
+      DB_PORT: 5432
+      DB_NAME: app
+
+    volumes:
+      - ./flask_app:/app
+
+    command: python wsgi.py
+
+  postgres:
+    image: postgres:14.1-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=app
+    ports:
+      - 5432:5432
+    volumes:
+      - db:/var/lib/postgresql/data
+
+volumes:
+  db:
+    driver: local
